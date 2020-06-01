@@ -13,6 +13,7 @@
 
 #define PWM_A (1<<PB1)
 #define PWM_B (1<<PB2)
+
 void ADC_init(int kanal)
 {
 ADMUX&=0xFC; //wyzerowanie mux0 i mux1
@@ -39,15 +40,13 @@ void silniki_init()
 }
 void jazda_przod()
 {
-	  sbi(PORTD, PD2);
-
+sbi(PORTD, PD2);
 PORTD|=0x01; //ustawia na 1 SIL1 0000|0001
 PORTD&=0xFD; //ustawia na 0 SIL1 1111|1101
 PORTD&=0x7F; //ustawia na 0 SIL2 0111|1111
 PORTB|=0x01; // ustawia na 1 SIL2 0000|0001
 OCR1A=100;
 OCR1B=100;
-
 }
 void jazda_tyl()
 {
@@ -119,7 +118,7 @@ silniki_init();
 int lewo=0;
 
     while (1) {
-    	/*do{
+    do{
     	cbi(PORTD, PD2);
     	_delay_ms(300);
     	sbi(PORTD, PD2);
@@ -127,23 +126,28 @@ int lewo=0;
     	stop();
     	}
     	while(PIND & 0x40 ); //guzik
-*/
+
 while(PIND & 0x40 ){
 	if(pomiary(0)>2.4){  //jezeli czujnik prawy
-
-		    	sbi(PORTD, PD2);
-		    	_delay_ms(3000);
+	jazda_tyl();
+	_delay_ms(500);
+	jazda_lewo();
+	_delay_ms(500);
 		lewo=1;
 	} else if(pomiary(1)>2.4){
-		cbi(PORTD, PD2);
-		    	_delay_ms(500);
-		    	sbi(PORTD, PD2);
-		    	_delay_ms(500);
+	jazda_tyl();
+	_delay_ms(500);
+	jazda_prawo();
+	_delay_ms(500);
+	lewo=0;	    	
 	}
 	else if(pomiary(2)>0.8){
 	jazda_przod();
-	_delay_ms(2000);
-	}else{jazda_kolko();}
+	_delay_ms(1000);
+	}else if(lewo=1){
+	jazda_lewo();
+	_delay_ms(500);;}
+	else jazda_kolko();
     	}
     }
 }
